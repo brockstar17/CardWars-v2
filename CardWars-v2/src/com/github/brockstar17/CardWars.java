@@ -35,15 +35,15 @@ public class CardWars extends JFrame implements Runnable, MouseMotionListener, M
 	private final int HEIGHT = 510;
 	public final int BOARDWIDTH = 1000;
 	public final int BOARDHEIGHT = 790;
-	
+
 	public static int cellW, cellH;
 	public static int cardSpaceX, cardSpaceY;
 	protected int mx, my;
-	
+
 	private Thread thread;
 
 	public static Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-	
+
 	private int boardX, boardY;
 	private int errors;
 
@@ -54,35 +54,31 @@ public class CardWars extends JFrame implements Runnable, MouseMotionListener, M
 	private ServerSocket serverSocket;
 
 	private boolean isServer = true;
-	
+
 	protected static BufferedImage startText;
 	protected static BufferedImage textSelect;
 	protected static BufferedImage marbleBoard;
 	public static BufferedImage marbleSelection;
-	
-	
+
 	protected static BufferedImage highlight;
 	protected static BufferedImage oppHl, yourHl;
-	
+
 	public static BufferedImage brighty;
 	public static BufferedImage gears;
-	
-	protected enum gameType {
-		HOST,
-		CLIENT,
-		LOCAL
+
+	protected enum gameType
+	{
+		HOST, CLIENT, LOCAL
 	}
-	
+
 	protected gameType gt;
 
 	private boolean unableToCommunicateWithOpponent;
 	public static boolean yourTurn = false;
 	private boolean accepted;
-	
-	
+
 	private StartPanel sp;
 	private GamePanel gp;
-	
 
 	public CardWars()
 	{
@@ -94,32 +90,31 @@ public class CardWars extends JFrame implements Runnable, MouseMotionListener, M
 
 		setSize(WIDTH, HEIGHT);
 		setLocationRelativeTo(null);
-		
+
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		
+
 		loadImages();
-		
+
 		Container c = getContentPane();
 		sp = new StartPanel(this);
 		c.add(sp);
-		
+
 		BoardSpaces.initCorners();
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		setResizable(false);
-		
-		
-		
+
 	}
 
 	public void run() {
-		while (true) {
+		while(true)
+		{
 			tick();
-			
 
-			if (!accepted) {
+			if(!accepted)
+			{
 				listenForServerRequest();
 			}
 
@@ -131,41 +126,43 @@ public class CardWars extends JFrame implements Runnable, MouseMotionListener, M
 
 		CardWars cardWars = new CardWars();
 	}
-	
-	private void loadImages(){
-		try {
+
+	private void loadImages() {
+		try
+		{
 			startText = ImageIO.read(getClass().getResourceAsStream("/StartText.png"));
 			textSelect = ImageIO.read(getClass().getResourceAsStream("/TextSelect.png"));
 			marbleBoard = ImageIO.read(getClass().getResourceAsStream("/marbleBoard.png"));
 			marbleSelection = ImageIO.read(getClass().getResourceAsStream("/marbleSelection.png"));
-			
+
 			highlight = ImageIO.read(getClass().getResourceAsStream("/highlight.png"));
 			oppHl = ImageIO.read(getClass().getResourceAsStream("/turnHl.png"));
 			yourHl = ImageIO.read(getClass().getResourceAsStream("/yourHl.png"));
-			
+
 			brighty = ImageIO.read(getClass().getResourceAsStream("/cards/brighty.png"));
 			gears = ImageIO.read(getClass().getResourceAsStream("/cards/gears.png"));
-			
-			
+
 			int cw = brighty.getWidth(), ch = brighty.getHeight();
-			
-			highlight = ImageUtils.scale(highlight,  ImageUtils.calcWidth(highlight.getHeight(), screen.getHeight() * .2165, highlight.getWidth()), (int) (screen.getHeight() * .216));
+
+			highlight = ImageUtils.scale(highlight, ImageUtils.calcWidth(highlight.getHeight(), screen.getHeight() * .2165, highlight.getWidth()), (int) (screen.getHeight() * .216));
 			oppHl = ImageUtils.scale(oppHl, highlight.getWidth(), highlight.getHeight());
 			yourHl = ImageUtils.scale(yourHl, highlight.getWidth(), highlight.getHeight());
-			
-			cellW = highlight.getWidth(); cellH = highlight.getHeight();
-			
-			cardSpaceY = (int) (cellH *.01 /2);
-			cardSpaceX = (int)(cellW *.15);
-			
-			brighty = ImageUtils.scale(brighty,  ImageUtils.calcWidth(ch, cellH - (cellH *.01), cw), (int) (cellH - (cellH *.01)));
+
+			cellW = highlight.getWidth();
+			cellH = highlight.getHeight();
+
+			cardSpaceY = (int) (cellH * .01 / 2);
+			cardSpaceX = (int) (cellW * .15);
+
+			brighty = ImageUtils.scale(brighty, ImageUtils.calcWidth(ch, cellH - (cellH * .01), cw), (int) (cellH - (cellH * .01)));
 			gears = ImageUtils.scale(gears, brighty.getWidth(), brighty.getHeight());
-			
-		} catch (IOException e) {
+
+		} catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public void mouseClicked(MouseEvent e) {
 	}
@@ -193,111 +190,123 @@ public class CardWars extends JFrame implements Runnable, MouseMotionListener, M
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		mx = e.getX(); my = e.getY();
-		
+		mx = e.getX();
+		my = e.getY();
+
 		repaint();
 	}
-	
-	protected void startGame(){
+
+	protected void startGame() {
 		Dimension ns = ImageUtils.sizeBoard(screen, this);
 		int nx = (int) ns.getWidth(), ny = (int) ns.getHeight();
 		gp = new GamePanel(this);
-		
+
 		switch(gt)
 		{
 		case HOST:
-			//start the host game
+			// start the host game
+
 			port = Integer.parseInt(JOptionPane.showInputDialog("Enter the port number"));
-			while (port < 1 || port > 65535) {
-				
+			while(port < 1 || port > 65535)
+			{
+
 				port = Integer.parseInt(JOptionPane.showInputDialog("The port you entered was invalid, please input another port"));
 			}
-			
+
 			initializeServer();
 			this.remove(sp);
 			this.setTitle("Card Wars Player 1");
-			
+
 			resizeBoardImg(nx, ny);
-			
+
 			yourTurn = true;
-			
-			setSize((int) (nx + (nx*.0055)), (int) (ny + (ny*.03)));
+
+			setSize((int) (nx + (nx * .0055)), (int) (ny + (ny * .03)));
 			this.setLocationRelativeTo(null);
 			this.add(gp);
 			repaint();
 			break;
-			
+
 		case CLIENT:
-			//connect to a host
+			// connect to a host
+			ip = JOptionPane.showInputDialog("Enter the IP address:");
+
 			port = Integer.parseInt(JOptionPane.showInputDialog("Enter the port number"));
-			while (port < 1 || port > 65535) {
-				
+			while(port < 1 || port > 65535)
+			{
+
 				port = Integer.parseInt(JOptionPane.showInputDialog("The port you entered was invalid, please input another port"));
 			}
-			
+
 			if(connect())
 			{
 				this.remove(sp);
 				this.setTitle("Card Wars Player 2");
-				
+
 				resizeBoardImg(nx, ny);
-				
+
 				yourTurn = false;
-				
-				setSize((int) (nx + (nx*.01)), (int) (ny + (ny*.1)));
+
+				setSize((int) (nx + (nx * .01)), (int) (ny + (ny * .1)));
 				this.setLocationRelativeTo(null);
 				this.add(gp);
 				repaint();
 			}
 			break;
-			
+
 		default:
-			//play againts ai
-			
+			// play againts ai
+
 			break;
-				
+
 		}
 	}
-	
+
 	private void initializeServer() {
-		try {
+		try
+		{
 			System.out.println("Starting up the server");
 			serverSocket = new ServerSocket(port, 8, InetAddress.getByName(ip));
-		} catch (Exception e) {
+		} catch (Exception e)
+		{
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	private boolean connect() {
-		try {
+		try
+		{
 			socket = new Socket(ip, port);
 			dos = new DataOutputStream(socket.getOutputStream());
 			dis = new DataInputStream(socket.getInputStream());
 			accepted = true;
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			JOptionPane.showMessageDialog(sp, "Unable to connect to the address: " + ip + ":" + port);
 			return false;
 		}
 		JOptionPane.showMessageDialog(sp, "Successfully connected to the server with address: " + ip + ":" + port);
-		
+
 		return true;
 	}
-	
-	private void tick() {
-		if (errors >= 10) unableToCommunicateWithOpponent = true;
 
-		
-		if (!yourTurn && !unableToCommunicateWithOpponent) {
-			
+	private void tick() {
+		if(errors >= 10)
+			unableToCommunicateWithOpponent = true;
+
+		if(!yourTurn && !unableToCommunicateWithOpponent)
+		{
+
 		}
 	}
-	
-	private void handleClick(){
+
+	private void handleClick() {
 		int cell = BoardSpaces.getCell(mx, my);
-		
-		if(cell == -1) return;
-		
+
+		if(cell == -1)
+			return;
+
 		if(CardWars.yourTurn)
 		{
 			if(cell == 15)
@@ -307,25 +316,25 @@ public class CardWars extends JFrame implements Runnable, MouseMotionListener, M
 			}
 		}
 	}
-	
+
 	private void listenForServerRequest() {
 		Socket socket = null;
-		try {
+		try
+		{
 			socket = serverSocket.accept();
 			dos = new DataOutputStream(socket.getOutputStream());
 			dis = new DataInputStream(socket.getInputStream());
 			accepted = true;
 			System.out.println("CLIENT HAS REQUESTED TO JOIN, AND WE HAVE ACCEPTED");
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 	}
-	
-	private void resizeBoardImg(int x, int y){
+
+	private void resizeBoardImg(int x, int y) {
 		marbleBoard = ImageUtils.scale(marbleBoard, x, y);
-		marbleSelection = ImageUtils.scale(marbleSelection, (int)(marbleBoard.getWidth()/1.5), (int)(marbleBoard.getHeight()/1.5));
+		marbleSelection = ImageUtils.scale(marbleSelection, (int) (marbleBoard.getWidth() / 1.5), (int) (marbleBoard.getHeight() / 1.5));
 	}
-	
-	
 
 }
