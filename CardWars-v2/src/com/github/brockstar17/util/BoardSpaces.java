@@ -9,33 +9,31 @@ public class BoardSpaces
 
 	private static int[] cornX = new int[20];
 	private static int[] cornY = new int[20];
-	
-	private static double screenX = CardWars.screen.getWidth();
-	private static double screenY = CardWars.screen.getHeight();
-	
-	
+
+	private static double screenX = CardWars.marbleBoard.getWidth();
+	private static double screenY = CardWars.marbleBoard.getHeight();
 
 	public static void initCorners() {
 		for(int i = 0; i < cornX.length; i++)
 		{
 			if(i <= 4)
 			{
-				cornX[i] = (int) (screenX * .01) + (int) (screenX * i * .18485);
-				cornY[i] = (int) (screenY * .012);
+				cornX[i] = (int) (screenX * .01) + (int) (i * 198);
+				cornY[i] = (int) (screenY * .01) + 3;
 			}
 			else if(i <= 9)
 			{
-				cornX[i] = (int) (screenX * .01) + (int) (screenX * (i - 5) * .18485);
-				cornY[i] = (int) (screenY * .24);
+				cornX[i] = (int) (screenX * .01) + (int) ((i - 5) * 198);
+				cornY[i] = (int) (screenY * .255) + 3;
 			}
 			else if(i <= 14)
 			{
-				cornX[i] = (int) (screenX * .01) + (int) (screenX * (i - 10) * .18485);
+				cornX[i] = (int) (screenX * .01) + (int) ((i - 10) * 198);
 				cornY[i] = (int) (screenY * .467);
 			}
 			else
 			{
-				cornX[i] = (int) (screenX * .01) + (int) (screenX * (i - 15) * .18485);
+				cornX[i] = (int) (screenX * .01) + (int) ((i - 15) * 198);
 				cornY[i] = (int) (screenY * .695);
 			}
 		}
@@ -49,7 +47,6 @@ public class BoardSpaces
 		return cornY[i];
 	}
 
-	
 	public static int getCell(int x, int y) {
 		if(CardWars.yourTurn)
 		{
@@ -93,7 +90,6 @@ public class BoardSpaces
 		}
 		return -1;
 	}
-	
 
 	public static boolean hasCard(int cell) {
 		if(GamePanel.pCards[cell] == null && GamePanel.oCards[cell] == null)
@@ -104,7 +100,7 @@ public class BoardSpaces
 	}
 
 	private static void setCellHighCard(boolean hasCard) {
-		//GamePanel.cellHighCard = hasCard;
+		// GamePanel.cellHighCard = hasCard;
 	}
 
 	public static boolean hasOtherCard(int cell) {

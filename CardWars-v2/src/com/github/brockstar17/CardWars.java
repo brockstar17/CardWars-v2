@@ -57,7 +57,7 @@ public class CardWars extends JFrame implements Runnable, MouseMotionListener, M
 
 	protected static BufferedImage startText;
 	protected static BufferedImage textSelect;
-	protected static BufferedImage marbleBoard;
+	public static BufferedImage marbleBoard;
 	public static BufferedImage marbleSelection;
 
 	protected static BufferedImage highlight;
@@ -88,13 +88,13 @@ public class CardWars extends JFrame implements Runnable, MouseMotionListener, M
 		ip = ConnectionUtils.getLocalIP();
 		System.out.println(ip);
 
+		loadImages();
+
 		setSize(WIDTH, HEIGHT);
 		setLocationRelativeTo(null);
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
-
-		loadImages();
 
 		Container c = getContentPane();
 		sp = new StartPanel(this);
@@ -197,8 +197,7 @@ public class CardWars extends JFrame implements Runnable, MouseMotionListener, M
 	}
 
 	protected void startGame() {
-		Dimension ns = ImageUtils.sizeBoard(screen, this);
-		int nx = (int) ns.getWidth(), ny = (int) ns.getHeight();
+
 		gp = new GamePanel(this);
 
 		switch(gt)
@@ -217,11 +216,9 @@ public class CardWars extends JFrame implements Runnable, MouseMotionListener, M
 			this.remove(sp);
 			this.setTitle("Card Wars Player 1");
 
-			resizeBoardImg(nx, ny);
-
 			yourTurn = true;
 
-			setSize((int) (nx + (nx * .0055)), (int) (ny + (ny * .03)));
+			setSize(marbleBoard.getWidth() + 5, marbleBoard.getHeight() + 29);
 			this.setLocationRelativeTo(null);
 			this.add(gp);
 			repaint();
@@ -243,11 +240,9 @@ public class CardWars extends JFrame implements Runnable, MouseMotionListener, M
 				this.remove(sp);
 				this.setTitle("Card Wars Player 2");
 
-				resizeBoardImg(nx, ny);
-
 				yourTurn = false;
 
-				setSize((int) (nx + (nx * .01)), (int) (ny + (ny * .1)));
+				setSize(marbleBoard.getWidth() + 5, marbleBoard.getHeight() + 40);
 				this.setLocationRelativeTo(null);
 				this.add(gp);
 				repaint();
@@ -330,11 +325,6 @@ public class CardWars extends JFrame implements Runnable, MouseMotionListener, M
 		{
 			e.printStackTrace();
 		}
-	}
-
-	private void resizeBoardImg(int x, int y) {
-		marbleBoard = ImageUtils.scale(marbleBoard, x, y);
-		marbleSelection = ImageUtils.scale(marbleSelection, (int) (marbleBoard.getWidth() / 1.5), (int) (marbleBoard.getHeight() / 1.5));
 	}
 
 }
